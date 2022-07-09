@@ -67,10 +67,9 @@
 
 .grid {
   display: flex;
-  align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  max-width: 800px;
+  max-width: 1000px;
 }
 
 .card {
@@ -106,6 +105,10 @@
 .logo {
   height: 1em;
   margin-left: 0.5rem;
+}
+
+.textcenter {
+  text-align: center;
 }
 
 @media (max-width: 600px) {
