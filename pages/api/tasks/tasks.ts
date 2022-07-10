@@ -1,4 +1,3 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import Task from "../../../interfaces/task.interface";
 
@@ -9,6 +8,7 @@ const storedTasks: Task[] = [
     description: "lorem x1",
     completed: true,
     tasksListId: "3",
+    index: 0,
   },
   {
     id: "2",
@@ -16,6 +16,7 @@ const storedTasks: Task[] = [
     description: "lorem x2",
     completed: false,
     tasksListId: "2",
+    index: 0,
   },
   {
     id: "3",
@@ -23,6 +24,7 @@ const storedTasks: Task[] = [
     description: "lorem x3",
     completed: false,
     tasksListId: "1",
+    index: 0,
   },
   {
     id: "4",
@@ -30,6 +32,7 @@ const storedTasks: Task[] = [
     description: "lorem x4",
     completed: false,
     tasksListId: "1",
+    index: 1,
   },
 ];
 
@@ -39,6 +42,18 @@ export default function tasks(
 ): void {
   if (req.method == "GET") {
     res.status(200).json(getTasks());
+  } else if (req.method == "PUT") {
+    let statusCode: number = 200;
+
+    let receivedTasks: Task[] = req.body;
+
+    try {
+      receivedTasks.forEach((task) => updateTask(task));
+    } catch {
+      statusCode = 400;
+    }
+
+    res.status(statusCode).end();
   }
 }
 
@@ -52,4 +67,17 @@ export function getTaskById(id: string): Task | undefined {
 
 export function getTaskByTasksListId(tasksListId: string): Task[] {
   return storedTasks.filter((task) => task.tasksListId === tasksListId);
+}
+
+export function updateTask(task: Task): boolean {
+  let fTask = storedTasks.find((mTask) => mTask.id === task.id);
+  if (fTask) {
+    fTask.title = task.title;
+    fTask.description = task.description;
+    fTask.completed = task.completed;
+    fTask.tasksListId = task.tasksListId;
+    fTask.index = task.index;
+    return true;
+  }
+  return false;
 }

@@ -4,4 +4,6 @@ export default interface Task {
   description: string;
   completed: boolean;
   tasksListId: string;
+  index: number;
+  collapsed?: boolean;
 }
