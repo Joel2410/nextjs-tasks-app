@@ -3,17 +3,27 @@ import Head from "next/head";
 import TasksList from "../interfaces/tasks-list.interface";
 import TasksListComponent from "../components/tasks-list.component";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Task from "../interfaces/task.interface";
-
-const API = "http://localhost:3000/api";
+import BaseModalComponent from "../components/base-modal.component";
+import { tasksService } from "./_app";
 
 type Props = {
-  tasksLists: TasksList[];
+  storedTasksLists: TasksList[];
 };
 
-const Home: NextPage<Props> = ({ tasksLists }) => {
+type TaskContextValue = {
+  onChangeTask?: (task: Task) => Promise<void>;
+  onDeleteTask?: (task: Task) => Promise<void>;
+};
+
+export const TaskContext = React.createContext<TaskContextValue>({});
+
+const Home: NextPage<Props> = ({ storedTasksLists }) => {
   const [ready, setReady] = useState(false);
+  const [tasksLists, setTasksLists] = useState(storedTasksLists);
+
+  const taskRef = useRef<Task>();
 
   useEffect(() => {
     if (typeof window === "object") {
@@ -60,9 +70,52 @@ const Home: NextPage<Props> = ({ tasksLists }) => {
     const uptatedTasks = [...originList.tasks, ...destinationList.tasks];
 
     try {
-      await updateTasks(uptatedTasks);
+      await tasksService.updateTasks(uptatedTasks);
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const onChangeTask = async (taskToUpdate: Task): Promise<void> => {
+    const tasksList = tasksLists.find(
+      (list) => list.id === taskToUpdate.tasksListId
+    );
+    if (!tasksList) return;
+
+    const originalTask = tasksList.tasks.find(
+      (task) => task.id === taskToUpdate.id
+    );
+    if (originalTask == null) return;
+
+    originalTask.deployed = taskToUpdate.deployed;
+
+    await tasksService.updateTasks([originalTask]);
+  };
+
+  const onDeleteTask = async (task: Task): Promise<void> => {
+    taskRef.current = task;
+  };
+
+  const handleDeleteDialog = async (choose: boolean) => {
+    if (!choose) return;
+    if (!taskRef.current) return;
+
+    const newTasksLists = [...tasksLists];
+
+    const originalList = newTasksLists.find(
+      (list) => list.id === taskRef.current?.tasksListId
+    );
+    if (!originalList) return;
+
+    const originalTask = originalList.tasks.find(
+      (task) => task.id === taskRef.current?.id
+    );
+    if (originalTask) {
+      originalList.tasks = originalList.tasks.filter(
+        (task) => task.id !== originalTask.id
+      );
+      setTasksLists(newTasksLists);
+      await tasksService.deleteTask(originalTask);
     }
   };
 
@@ -75,40 +128,37 @@ const Home: NextPage<Props> = ({ tasksLists }) => {
       </Head>
 
       <main>
-        <h1 className="my-5">
-          Create <a href="https://nextjs.org">new task!</a>
-        </h1>
+        <h1 className="my-5">Tasks App!</h1>
 
         <div className="row">
           {ready && (
             <DragDropContext onDragEnd={onDragEnd}>
               {tasksLists.map((tasksList) => (
-                <TasksListComponent key={tasksList.id} tasksList={tasksList} />
+                <TaskContext.Provider
+                  key={tasksList.id}
+                  value={{ onChangeTask, onDeleteTask }}
+                >
+                  <TasksListComponent tasksList={tasksList} />
+                </TaskContext.Provider>
               ))}
             </DragDropContext>
           )}
         </div>
       </main>
+
+      <BaseModalComponent
+        id="DeleteConfirmation"
+        title="Alert"
+        body="Are you sure you want to delete this task?"
+        dialogResult={handleDeleteDialog}
+      />
     </div>
   );
 };
 
 export async function getServerSideProps(): Promise<{ props: Props }> {
-  const res = await fetch(`${API}/tasks-list`);
-  const data: TasksList[] = await res.json();
-  return { props: { tasksLists: data } };
-}
-
-async function updateTasks(tasks: Task[]): Promise<boolean> {
-  const res = await fetch(`${API}/tasks`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(tasks),
-  });
-
-  return res.status === 200;
+  const data = await tasksService.getTasksLists();
+  return { props: { storedTasksLists: data } };
 }
 
 export default Home;

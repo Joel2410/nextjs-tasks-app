@@ -1,17 +1,23 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Task from "../../../interfaces/task.interface";
-import { getTaskById } from "./tasks";
+import { deleteTaskById, getTaskById } from "./tasks";
 
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Task>
 ) {
-  const { id } = req.query;
-  const task = getTaskById(id as string);
+  const id = req.query?.id as string;
 
-  if (task) {
-    res.status(200).json(task);
-  } else {
+  const task = getTaskById(id);
+  if (!task) {
     res.status(404).end(id);
+    return;
+  }
+
+  if (req.method === "GET") {
+    res.status(200).json(task);
+  } else if (req.method === "DELETE") {
+    deleteTaskById(id);
+    res.status(200).end(id);
   }
 }
