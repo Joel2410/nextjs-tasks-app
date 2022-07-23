@@ -1,1 +1,1 @@
-export const API = "http://localhost:3000/api";
+export const API = "https://nextjs-tasks-app.vercel.app/api";
