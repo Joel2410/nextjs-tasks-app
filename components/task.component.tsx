@@ -40,7 +40,7 @@ export default function TaskComponent(props: Props) {
           <div className="accordion-item mb-3">
             <div className="accordion-header" id={"heading" + task.id}>
               <div className="row py-3 px-4">
-                <h5 className="col-10">{task.title}</h5>
+                <h5 className="col-10 mt-1">{task.title}</h5>
                 <button
                   className={`col-2 btn btn-outline-${
                     task.deployed ? "danger" : "secondary collapsed"

@@ -13,7 +13,10 @@ export default function TasksListComponent(props: Props) {
   return (
     <Droppable droppableId={tasksList.id}>
       {(provided, _snapshot) => (
-        <div {...provided.droppableProps} className="col-12 col-md-6 col-lg-4">
+        <div
+          {...provided.droppableProps}
+          className="col-12 col-md-6 col-lg-4 mb-5"
+        >
           <div className="card p-4">
             <h4 className="">{tasksList.title}</h4>
             <div

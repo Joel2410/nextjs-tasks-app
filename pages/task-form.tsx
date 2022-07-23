@@ -81,6 +81,7 @@ const TaskForm: NextPage<Props> = ({ task }) => {
               minLength={4}
               value={formData.title}
               onChange={handleChange}
+              autoFocus
             />
           </div>
 
