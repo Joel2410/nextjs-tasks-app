@@ -1,1 +1,4 @@
-export const API = "https://nextjs-tasks-app.vercel.app/api";
+export const API =
+  process.env.NODE_ENV == "development"
+    ? process.env.DEV_API
+    : process.env.PROD_API;

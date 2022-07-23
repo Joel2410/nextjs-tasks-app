@@ -1,29 +1,20 @@
 import { v4 as uuidv4 } from "uuid";
 import type { NextApiRequest, NextApiResponse } from "next";
 import Task from "../../../interfaces/task.interface";
-//import { LocalStorage } from "node-localstorage";
 
 let storedTasks: Task[] = [];
 let tasksLoaded = false;
-
-//const localStorage = new LocalStorage("./storedTasks");
 
 const loadTasks = (): void => {
   if (tasksLoaded) return;
 
   tasksLoaded = true;
-  //const getStoredTasks = localStorage.getItem("tasks");
-  //if (!getStoredTasks) return;
-
-  // try {
-  //   storedTasks = JSON.parse(getStoredTasks);
-  // } catch (error) {
-  //   storedTasks = [];
-  // }
+  // To do, should load task from database
 };
 
 const saveTasks = (): void => {
-  //localStorage.setItem("tasks", JSON.stringify(storedTasks));
+  return;
+  // To do: should save task into database
 };
 
 export default function tasks(
