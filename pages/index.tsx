@@ -63,11 +63,17 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
       task.index = index;
     });
 
-    destinationList.tasks.forEach((task, index) => {
-      task.index = index;
-    });
+    if (originList.id !== destinationList.id) {
+      destinationList.tasks.forEach((task, index) => {
+        task.index = index;
+      });
+    }
 
-    const uptatedTasks = [...originList.tasks, ...destinationList.tasks];
+    const uptatedTasks = [...originList.tasks];
+
+    if (originList.id !== destinationList.id) {
+      uptatedTasks.push(...destinationList.tasks);
+    }
 
     try {
       await tasksService.updateTasks(uptatedTasks);
@@ -158,7 +164,20 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
 
 export async function getServerSideProps(): Promise<{ props: Props }> {
   const data = await tasksService.getTasksLists();
+
+  data.forEach((list) => {
+    list.tasks = sortedTasks(list);
+  });
+
   return { props: { storedTasksLists: data } };
 }
+
+const sortedTasks = (list: TasksList): Task[] => {
+  return list.tasks.sort(compareTaskIndex);
+};
+
+const compareTaskIndex = (taskA: Task, taskB: Task): number => {
+  return taskA.index < taskB.index ? -1 : 0;
+};
 
 export default Home;

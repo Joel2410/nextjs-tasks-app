@@ -38,6 +38,7 @@ export default function tasks(
 
         try {
           receivedTasks.forEach((task) => updateTask(task));
+          saveTasks();
         } catch {
           statusCode = 400;
         }
@@ -93,7 +94,6 @@ export function updateTask(task: Task): boolean {
     storedTask.deployed = task.deployed;
     return true;
   }
-  saveTasks();
   return false;
 }
 
