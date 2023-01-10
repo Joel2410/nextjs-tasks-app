@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChangeEvent, useState } from "react";
 import { useRouter } from "next/router";
 import { tasksService } from "./_app";
+import Button from '@mui/material/Button';
 
 type Props = {
   task: Task;
@@ -107,10 +108,7 @@ const TaskForm: NextPage<Props> = ({ task }) => {
                   Cancel
                 </button>
               </Link>
-
-              <button type="submit" className="col-4 btn btn-primary">
-                Save
-              </button>
+              <Button type="submit" variant="contained" className="col-4 btn btn-primary">Save</Button>
             </div>
           </div>
         </form>
