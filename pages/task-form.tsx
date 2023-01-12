@@ -4,8 +4,6 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
 
-import { useForm } from "react-hook-form";
-
 // mui
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
