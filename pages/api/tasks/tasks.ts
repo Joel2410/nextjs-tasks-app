@@ -1,5 +1,7 @@
-import { v4 as uuidv4 } from "uuid";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { v4 as uuidv4 } from "uuid";
+
+// own imports
 import Task from "../../../interfaces/task.interface";
 
 let storedTasks: Task[] = [];

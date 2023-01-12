@@ -1,8 +1,18 @@
-import Task from "../interfaces/task.interface";
-import { Draggable } from "react-beautiful-dnd";
 import { useContext, useState } from "react";
-import { TaskContext } from "../pages";
 import Link from "next/link";
+import { Draggable } from "react-beautiful-dnd";
+
+// mui
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Button from "@mui/material/Button";
+
+// own imports
+import Task from "../interfaces/task.interface";
+import { TaskContext } from "../pages";
 
 type Props = {
   task: Task;
@@ -16,6 +26,8 @@ export default function TaskComponent(props: Props) {
   const [loading, setLoading] = useState(false);
 
   const deployTask = async () => {
+    if (loading) return;
+    
     setLoading(true);
     const newTask = { ...task, deployed: !task.deployed };
     await onChangeTask?.(newTask);
@@ -37,55 +49,48 @@ export default function TaskComponent(props: Props) {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
         >
-          <div className="accordion-item mb-3">
-            <div className="accordion-header" id={"heading" + task.id}>
-              <div className="row py-3 px-4">
-                <h5 className="col-10 mt-1">{task.title}</h5>
-                <button
-                  className={`col-2 btn btn-outline-${
-                    task.deployed ? "danger" : "secondary collapsed"
-                  }`}
-                  type="button"
-                  data-bs-toggle="collapse"
-                  data-bs-target={"#collapse" + task.id}
-                  aria-expanded={task.deployed}
-                  aria-controls={"collapse" + task.id}
-                  onClick={deployTask}
-                  disabled={loading}
-                >
-                  {task.deployed ? "-" : "+"}
-                </button>
-              </div>
-            </div>
-
-            <div
-              id={"collapse" + task.id}
-              className={`accordion-collapse collapse ${
-                task.deployed ? "show" : ""
-              }`}
-              aria-labelledby={"heading" + task.id}
+          <Accordion
+            ref={provided.innerRef}
+            expanded={task.deployed}
+            
+            className="mb-3">
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              disableRipple={false}
+              onClick={deployTask}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
             >
-              <div className="accordion-body">
-                <p>{task.description}</p>
-                <div className="footer row">
-                  <button
+              <Typography variant="subtitle2" >{task.title}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography variant="body2" className="card p-2"> {task.description} </Typography>
+              <div className="footer row mt-4">
+                <Button
+                  type="button"
+                  variant="contained"
+                  className="col mx-2"
+                  color="secondary"
+                  data-bs-toggle="modal"
+                  data-bs-target="#DeleteConfirmation"
+                  onClick={deleteTask}
+                >
+                  Delete
+                </Button>
+                <Link href={`task-form?taskId=${task.id}`}>
+                  <Button
                     type="button"
-                    className="col btn btn-danger mx-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#DeleteConfirmation"
+                    variant="contained"
+                    className="col mx-2"
+                    color="primary"
                     onClick={deleteTask}
                   >
-                    Delete
-                  </button>
-                  <Link href={`task-form?taskId=${task.id}`}>
-                    <button type="button" className="col btn btn-primary mx-2">
-                      Edit
-                    </button>
-                  </Link>
-                </div>
+                    Edit
+                  </Button>
+                </Link>
               </div>
-            </div>
-          </div>
+            </AccordionDetails>
+          </Accordion>
         </div>
       )}
     </Draggable>

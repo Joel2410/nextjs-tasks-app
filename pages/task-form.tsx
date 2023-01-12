@@ -1,11 +1,18 @@
+import { ChangeEvent, useState, FormEventHandler } from "react";
+import { useRouter } from "next/router";
 import type { NextPage } from "next";
 import Head from "next/head";
-import Task from "../interfaces/task.interface";
 import Link from "next/link";
-import { ChangeEvent, useState } from "react";
-import { useRouter } from "next/router";
+
+import { useForm } from "react-hook-form";
+
+// mui
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+
+// own imports
+import Task from "../interfaces/task.interface";
 import { tasksService } from "./_app";
-import Button from '@mui/material/Button';
 
 type Props = {
   task: Task;
@@ -20,9 +27,8 @@ const TaskForm: NextPage<Props> = ({ task }) => {
 
   const isEdit = !!task.id;
 
-  const handleSubmit = async (event: { preventDefault: () => void }) => {
+  const onSubmit: FormEventHandler = async (event) => {
     event.preventDefault();
-
     if (isEdit) {
       if (await tasksService.updateTask(formData)) {
         router.push("/");
@@ -64,51 +70,54 @@ const TaskForm: NextPage<Props> = ({ task }) => {
         <h1 className="my-5 text-center">Create Task!</h1>
 
         <form
-          onSubmit={handleSubmit}
-          method="post"
+          onSubmit={onSubmit}
+          method="POST"
           className="row card p-4"
-          style={{ width: "400px" }}
-        >
+          style={{ width: "400px" }}>
           <div className="col mb-3">
-            <label htmlFor="title" className="form-label">
-              Title
-            </label>
-            <input
-              type="text"
-              className="form-control"
+            <TextField
               id="title"
+              label="Title"
+              variant="outlined"
               placeholder="To do..."
-              required
-              minLength={4}
               value={formData.title}
               onChange={handleChange}
-              autoFocus
-            />
+              inputProps={{ minLength: 4, required: true }}
+              fullWidth
+              autoFocus />
           </div>
 
           <div className="col mb-3">
-            <label htmlFor="description" className="form-label">
-              Description
-            </label>
-            <input
-              type="text"
-              className="form-control"
+            <TextField
               id="description"
+              label="Description"
+              variant="outlined"
               placeholder="Something..."
-              required
-              minLength={4}
               value={formData.description}
               onChange={handleChange}
-            />
+              inputProps={{ minLength: 4, required: true }}
+              fullWidth />
           </div>
           <div className="col">
             <div className="row justify-content-between px-3">
               <Link href="/">
-                <button type="button" className="col-4 btn btn-danger">
+                <Button
+                  type="button"
+                  variant="contained"
+                  className="col-4"
+                  color="secondary"
+                >
                   Cancel
-                </button>
+                </Button>
               </Link>
-              <Button type="submit" variant="contained" className="col-4 btn btn-primary">Save</Button>
+              <Button
+                type="submit"
+                variant="contained"
+                className="col-4"
+                color="primary"
+              >
+                Save
+              </Button>
             </div>
           </div>
         </form>

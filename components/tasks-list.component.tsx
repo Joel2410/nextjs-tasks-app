@@ -1,8 +1,13 @@
-import TasksList from "../interfaces/tasks-list.interface";
-import TaskComponent from "./task.component";
-import { Droppable } from "react-beautiful-dnd";
 import { Fragment } from "react";
 import Link from "next/link";
+import { Droppable } from "react-beautiful-dnd";
+
+// mui
+import Button from "@mui/material/Button";
+
+// own imports
+import TasksList from "../interfaces/tasks-list.interface";
+import TaskComponent from "./task.component";
 
 type Props = {
   tasksList: TasksList;
@@ -18,11 +23,9 @@ export default function TasksListComponent(props: Props) {
           className="col-12 col-md-6 col-lg-4 mb-5"
         >
           <div className="card p-4">
-            <h4 className="">{tasksList.title}</h4>
+            <h4 className="mb-4">{tasksList.title}</h4>
             <div
               ref={provided.innerRef}
-              className="accordion"
-              id={"accordionExample" + tasksList.id}
             >
               {tasksList.tasks.map((task, index) => (
                 <Fragment key={task.id}>
@@ -32,9 +35,14 @@ export default function TasksListComponent(props: Props) {
             </div>
             {provided.placeholder}
             <Link href={`task-form/?tasksListId=${tasksList.id}`}>
-              <button className="col btn btn-outline-success" type="button">
+              <Button
+                type="button"
+                variant="outlined"
+                className="col mx-2"
+                color="success"
+              >
                 Add new task
-              </button>
+              </Button>
             </Link>
           </div>
         </div>

@@ -1,10 +1,12 @@
+import React, { useEffect, useRef, useState } from "react";
 import type { NextPage } from "next";
 import Head from "next/head";
+import { DragDropContext, DropResult } from "react-beautiful-dnd";
+
+// own imports
+import Task from "../interfaces/task.interface";
 import TasksList from "../interfaces/tasks-list.interface";
 import TasksListComponent from "../components/tasks-list.component";
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
-import React, { useEffect, useRef, useState } from "react";
-import Task from "../interfaces/task.interface";
 import BaseModalComponent from "../components/base-modal.component";
 import { tasksService } from "./_app";
 
