@@ -27,7 +27,7 @@ export default function TaskComponent(props: Props) {
 
   const deployTask = async () => {
     if (loading) return;
-    
+
     setLoading(true);
     const newTask = { ...task, deployed: !task.deployed };
     await onChangeTask?.(newTask);
@@ -52,7 +52,7 @@ export default function TaskComponent(props: Props) {
           <Accordion
             ref={provided.innerRef}
             expanded={task.deployed}
-            
+
             className="mb-3">
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
@@ -71,8 +71,6 @@ export default function TaskComponent(props: Props) {
                   variant="contained"
                   className="col mx-2"
                   color="secondary"
-                  data-bs-toggle="modal"
-                  data-bs-target="#DeleteConfirmation"
                   onClick={deleteTask}
                 >
                   Delete
@@ -83,7 +81,6 @@ export default function TaskComponent(props: Props) {
                     variant="contained"
                     className="col mx-2"
                     color="primary"
-                    onClick={deleteTask}
                   >
                     Edit
                   </Button>

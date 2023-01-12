@@ -1,54 +1,50 @@
+// mui
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+
 type Props = {
-  id: string;
   title: string;
   body: string;
+  open: boolean;
   dialogResult: (choose: boolean) => void;
 };
 
 export default function BaseModalComponent(props: Props) {
+  const hadleConfirm = () => {
+    props.dialogResult(true)
+  };
+
+  const handleCancel = () => {
+    props.dialogResult(false);
+  };
+
   return (
-    <div
-      className="modal fade"
-      id={props.id}
-      tabIndex={-1}
-      aria-labelledby={`modalLabel${props.id}`}
-      aria-hidden="true"
-    >
-      <div className="modal-dialog">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title" id={`modalLabel${props.id}`}>
-              {props.title}
-            </h5>
-            <button
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-              onClick={() => props.dialogResult(false)}
-            ></button>
-          </div>
-          <div className="modal-body">{props.body}</div>
-          <div className="modal-footer">
-            <button
-              type="button"
-              className="btn btn-secondary"
-              data-bs-dismiss="modal"
-              onClick={() => props.dialogResult(false)}
-            >
-              No
-            </button>
-            <button
-              type="button"
-              className="btn btn-primary"
-              data-bs-dismiss="modal"
-              onClick={() => props.dialogResult(true)}
-            >
-              Yes
-            </button>
-          </div>
-        </div>
-      </div>
+    <div>
+      <Dialog
+        open={props.open}
+        onClose={handleCancel}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {props.title}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {props.body}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancel}>No</Button>
+          <Button onClick={hadleConfirm} autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

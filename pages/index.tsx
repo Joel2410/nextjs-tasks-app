@@ -24,6 +24,7 @@ export const TaskContext = React.createContext<TaskContextValue>({});
 const Home: NextPage<Props> = ({ storedTasksLists }) => {
   const [ready, setReady] = useState(false);
   const [tasksLists, setTasksLists] = useState(storedTasksLists);
+  const [open, setOpen] = useState(false);
 
   const taskRef = useRef<Task>();
 
@@ -102,9 +103,11 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
 
   const onDeleteTask = async (task: Task): Promise<void> => {
     taskRef.current = task;
+    setOpen(true);
   };
 
   const handleDeleteDialog = async (choose: boolean) => {
+    setOpen(false);
     if (!choose) return;
     if (!taskRef.current) return;
 
@@ -155,9 +158,9 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
       </main>
 
       <BaseModalComponent
-        id="DeleteConfirmation"
         title="Alert"
         body="Are you sure you want to delete this task?"
+        open={open}
         dialogResult={handleDeleteDialog}
       />
     </div>
