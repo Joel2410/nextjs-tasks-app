@@ -1,13 +1,15 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import Link from "next/link";
+import { action, runInAction } from "mobx";
+import { useLocalObservable, Observer } from "mobx-react-lite";
 import { Draggable } from "react-beautiful-dnd";
 
 // mui
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import Typography from "@mui/material/Typography";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Button from "@mui/material/Button";
 
 // own imports
@@ -21,74 +23,88 @@ type Props = {
 
 export default function TaskComponent(props: Props) {
   const index = props.index;
-  const [task, setTask] = useState(props.task);
   const { onChangeTask, onDeleteTask } = useContext(TaskContext);
-  const [loading, setLoading] = useState(false);
+  const data = useLocalObservable(() => ({
+    task: props.task,
+    loading: false
+  }));
 
-  const deployTask = async () => {
-    if (loading) return;
+  const deployTask = action(async () => {
+    if (data.loading) return;
 
-    setLoading(true);
-    const newTask = { ...task, deployed: !task.deployed };
-    await onChangeTask?.(newTask);
-    setTask(newTask);
-    setLoading(false);
-  };
+    data.loading = true;
+    data.task.deployed = !data.task.deployed;
+    await onChangeTask?.(data.task);
 
-  const deleteTask = async () => {
-    setLoading(true);
-    await onDeleteTask?.(task);
-    setLoading(false);
-  };
+    // NOTE: This is because it is running after await
+    runInAction(() => {
+      data.loading = false;
+    });
+  });
+
+  const deleteTask = action(async () => {
+    data.loading = true;
+
+    await onDeleteTask?.(data.task);
+
+    // NOTE: This is because it is running after await
+    runInAction(() => {
+      data.loading = false;
+    });
+  });
 
   return (
-    <Draggable draggableId={task.id} index={index}>
+    <Draggable draggableId={data.task.id} index={index}>
       {(provided, _snapshot) => (
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-        >
-          <Accordion
+        <Observer>
+          {() => (<div
             ref={provided.innerRef}
-            expanded={task.deployed}
-
-            className="mb-3">
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              disableRipple={false}
-              onClick={deployTask}
-              aria-controls="panel1a-content"
-              id="panel1a-header"
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+          >
+            <Accordion
+              ref={provided.innerRef}
+              expanded={data.task.deployed}
+              className="mb-3"
             >
-              <Typography variant="subtitle2" >{task.title}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Typography variant="body2" className="card p-2"> {task.description} </Typography>
-              <div className="footer row mt-4">
-                <Button
-                  type="button"
-                  variant="contained"
-                  className="col mx-2"
-                  color="secondary"
-                  onClick={deleteTask}
-                >
-                  Delete
-                </Button>
-                <Link href={`task-form?taskId=${task.id}`}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                disableRipple={false}
+                onClick={deployTask}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+              >
+                <Typography variant="subtitle2">{data.task.title}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography variant="body2" className="card p-2">
+                  {data.task.description}
+                </Typography>
+                <div className="footer row mt-4">
                   <Button
                     type="button"
                     variant="contained"
                     className="col mx-2"
-                    color="primary"
+                    color="secondary"
+                    onClick={deleteTask}
                   >
-                    Edit
+                    Delete
                   </Button>
-                </Link>
-              </div>
-            </AccordionDetails>
-          </Accordion>
-        </div>
+                  <Link href={`task-form?taskId=${data.task.id}`}>
+                    <Button
+                      type="button"
+                      variant="contained"
+                      className="col mx-2"
+                      color="primary"
+                    >
+                      Edit
+                    </Button>
+                  </Link>
+                </div>
+              </AccordionDetails>
+            </Accordion>
+          </div>)}
+        </Observer>
       )}
     </Draggable>
   );

@@ -1,8 +1,10 @@
-import { ChangeEvent, useState, FormEventHandler } from "react";
+import { ChangeEvent, FormEventHandler } from "react";
 import { useRouter } from "next/router";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
+import { action } from "mobx";
+import { observer, useLocalObservable } from "mobx-react-lite";
 
 // mui
 import Button from "@mui/material/Button";
@@ -18,17 +20,13 @@ type Props = {
 
 const TaskForm: NextPage<Props> = ({ task }) => {
   const router = useRouter();
-
-  const [formData, setFormData] = useState<Task>(
-    task ?? tasksService.newTask()
-  );
-
   const isEdit = !!task.id;
+  const data = useLocalObservable(() => ({ formData: task ?? tasksService.newTask() }));
 
   const onSubmit: FormEventHandler = async (event) => {
     event.preventDefault();
     if (isEdit) {
-      if (await tasksService.updateTask(formData)) {
+      if (await tasksService.updateTask(data.formData)) {
         router.push("/");
         return;
       }
@@ -38,7 +36,7 @@ const TaskForm: NextPage<Props> = ({ task }) => {
     const tasksListId = router.query?.tasksListId as string;
     if (
       await tasksService.saveTask({
-        ...formData,
+        ...data.formData,
         deployed: false,
         index: -1,
         tasksListId,
@@ -48,13 +46,10 @@ const TaskForm: NextPage<Props> = ({ task }) => {
     }
   };
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = action((event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
-    setFormData({
-      ...formData,
-      [id]: value,
-    });
-  };
+    data.formData = { ...data.formData, [id]: value }
+  });
 
   return (
     <div className="container">
@@ -66,23 +61,24 @@ const TaskForm: NextPage<Props> = ({ task }) => {
 
       <main className="row justify-content-center">
         <h1 className="my-5 text-center">Create Task!</h1>
-
         <form
           onSubmit={onSubmit}
           method="POST"
           className="row card p-4"
-          style={{ width: "400px" }}>
+          style={{ width: "400px" }}
+        >
           <div className="col mb-3">
             <TextField
               id="title"
               label="Title"
               variant="outlined"
               placeholder="To do..."
-              value={formData.title}
+              value={data.formData.title}
               onChange={handleChange}
               inputProps={{ minLength: 4, required: true }}
               fullWidth
-              autoFocus />
+              autoFocus
+            />
           </div>
 
           <div className="col mb-3">
@@ -91,10 +87,11 @@ const TaskForm: NextPage<Props> = ({ task }) => {
               label="Description"
               variant="outlined"
               placeholder="Something..."
-              value={formData.description}
+              value={data.formData.description}
               onChange={handleChange}
               inputProps={{ minLength: 4, required: true }}
-              fullWidth />
+              fullWidth
+            />
           </div>
           <div className="col">
             <div className="row justify-content-between px-3">
@@ -139,4 +136,4 @@ export async function getServerSideProps(context: {
   return { props: { task } };
 }
 
-export default TaskForm;
+export default observer(TaskForm);

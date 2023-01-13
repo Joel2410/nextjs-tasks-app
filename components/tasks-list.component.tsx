@@ -24,9 +24,7 @@ export default function TasksListComponent(props: Props) {
         >
           <div className="card p-4">
             <h4 className="mb-4">{tasksList.title}</h4>
-            <div
-              ref={provided.innerRef}
-            >
+            <div ref={provided.innerRef}>
               {tasksList.tasks.map((task, index) => (
                 <Fragment key={task.id}>
                   <TaskComponent task={task} index={index} />
