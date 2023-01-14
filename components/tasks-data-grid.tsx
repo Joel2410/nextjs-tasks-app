@@ -26,9 +26,8 @@ function TasksDataGrid(props: Props) {
             width: 300,
         },
         {
-            field: "tasksListId",
-            headerName: "Tasks list ID",
-            type: "number",
+            field: "status",
+            headerName: "Status",
             width: 150,
         }
     ];

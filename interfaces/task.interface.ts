@@ -5,4 +5,5 @@ export default interface Task {
   tasksListId: string;
   index: number;
   deployed: boolean;
+  status? : string;
 }

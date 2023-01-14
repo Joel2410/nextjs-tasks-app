@@ -139,7 +139,10 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
   const getTasks = (): Task[] => {
     const tasks: Task[] = [];
     data.tasksLists.forEach((tasksList) => {
-      tasks.push(...tasksList.tasks);
+      tasksList.tasks.forEach((task) => {
+        task.status = tasksList.title;
+        tasks.push(task);
+      })
     });
     return tasks;
   };
