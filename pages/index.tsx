@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import { useLocalObservable, observer } from "mobx-react-lite";
+import { action, runInAction } from "mobx";
 
 // own imports
 import Task from "../interfaces/task.interface";
@@ -9,6 +11,7 @@ import TasksList from "../interfaces/tasks-list.interface";
 import TasksListComponent from "../components/tasks-list.component";
 import BaseModalComponent from "../components/base-modal.component";
 import { tasksService } from "./_app";
+import TasksDataGrid from "../components/tasks-data-grid";
 
 type Props = {
   storedTasksLists: TasksList[];
@@ -22,31 +25,36 @@ type TaskContextValue = {
 export const TaskContext = React.createContext<TaskContextValue>({});
 
 const Home: NextPage<Props> = ({ storedTasksLists }) => {
-  const [ready, setReady] = useState(false);
-  const [tasksLists, setTasksLists] = useState(storedTasksLists);
-  const [open, setOpen] = useState(false);
+
+  const data = useLocalObservable(() => ({
+    tasksLists: storedTasksLists,
+    ready: false,
+    open: false
+  }));
 
   const taskRef = useRef<Task>();
 
   useEffect(() => {
     if (typeof window === "object") {
-      setReady(true);
+      runInAction(() => {
+        data.ready = true;
+      });
     }
   }, []);
 
-  const onDragEnd = async (result: DropResult): Promise<void> => {
+  const onDragEnd = action(async (result: DropResult): Promise<void> => {
     if (!result.source || !result.destination) {
       return;
     }
 
-    const originList = tasksLists.find(
+    const originList = data.tasksLists.find(
       (list) => list.id === result.source.droppableId
     );
     if (!originList) {
       return;
     }
 
-    const destinationList = tasksLists.find(
+    const destinationList = data.tasksLists.find(
       (list) => list.id === result.destination?.droppableId
     );
     if (!destinationList) {
@@ -83,10 +91,10 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
     } catch (error) {
       console.error(error);
     }
-  };
+  });
 
-  const onChangeTask = async (taskToUpdate: Task): Promise<void> => {
-    const tasksList = tasksLists.find(
+  const onChangeTask = action(async (taskToUpdate: Task): Promise<void> => {
+    const tasksList = data.tasksLists.find(
       (list) => list.id === taskToUpdate.tasksListId
     );
     if (!tasksList) return;
@@ -99,21 +107,19 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
     originalTask.deployed = taskToUpdate.deployed;
 
     await tasksService.updateTasks([originalTask]);
-  };
+  });
 
   const onDeleteTask = async (task: Task): Promise<void> => {
     taskRef.current = task;
-    setOpen(true);
+    data.open = true;
   };
 
   const handleDeleteDialog = async (choose: boolean) => {
-    setOpen(false);
+    data.open = false;
     if (!choose) return;
     if (!taskRef.current) return;
 
-    const newTasksLists = [...tasksLists];
-
-    const originalList = newTasksLists.find(
+    const originalList = data.tasksLists.find(
       (list) => list.id === taskRef.current?.tasksListId
     );
     if (!originalList) return;
@@ -125,9 +131,17 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
       originalList.tasks = originalList.tasks.filter(
         (task) => task.id !== originalTask.id
       );
-      setTasksLists(newTasksLists);
+
       await tasksService.deleteTask(originalTask);
     }
+  };
+
+  const getTasks = (): Task[] => {
+    const tasks: Task[] = [];
+    data.tasksLists.forEach((tasksList) => {
+      tasks.push(...tasksList.tasks);
+    });
+    return tasks;
   };
 
   return (
@@ -141,10 +155,14 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
       <main>
         <h1 className="my-5">Tasks App!</h1>
 
+        <div className="row mb-4">
+          {data.ready && (<TasksDataGrid tasks={getTasks()} />)}
+        </div>
+
         <div className="row">
-          {ready && (
+          {data.ready && (
             <DragDropContext onDragEnd={onDragEnd}>
-              {tasksLists.map((tasksList) => (
+              {data.tasksLists.map((tasksList) => (
                 <TaskContext.Provider
                   key={tasksList.id}
                   value={{ onChangeTask, onDeleteTask }}
@@ -160,7 +178,7 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
       <BaseModalComponent
         title="Alert"
         body="Are you sure you want to delete this task?"
-        open={open}
+        open={data.open}
         dialogResult={handleDeleteDialog}
       />
     </div>
@@ -185,4 +203,4 @@ const compareTaskIndex = (taskA: Task, taskB: Task): number => {
   return taskA.index < taskB.index ? -1 : 0;
 };
 
-export default Home;
+export default observer(Home);
