@@ -6,6 +6,7 @@ import { action } from "mobx";
 
 // mui
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Pagination from "@mui/material/Pagination";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
@@ -41,6 +42,7 @@ function Users() {
       width: 100,
     },
   ];
+
   const onChangePage = action(
     useCallback((_event: React.ChangeEvent<unknown>, page: number) => {
       usersStore.pageNumber = page;
@@ -66,9 +68,9 @@ function Users() {
           <h1 className="my-2">Users list</h1>
 
           <Link href="/">
-            <h5 style={{ color: "blue", cursor: "pointer", maxWidth: 150 }}>
+            <Button className="me-3" variant="outlined">
               Go to tasks app
-            </h5>
+            </Button>
           </Link>
         </div>
 

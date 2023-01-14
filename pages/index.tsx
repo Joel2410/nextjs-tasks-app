@@ -6,6 +6,8 @@ import { action, runInAction } from "mobx";
 import { useLocalObservable, observer } from "mobx-react-lite";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 
+import Button from "@mui/material/Button";
+
 // own imports
 import Task from "../interfaces/task.interface";
 import TasksList from "../interfaces/tasks-list.interface";
@@ -154,13 +156,20 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
 
       <main>
         <div className="my-5">
-          <h1 className="my-2">Tasks App!</h1>
+          <h1 className="my-2 mb-4">Tasks App!</h1>
+          <div className="d-flex">
+            <Link href="/users">
+              <Button className="me-3" variant="outlined">
+                Go to users list
+              </Button>
+            </Link>
 
-          <Link href="/users">
-            <h5 style={{ color: "blue", cursor: "pointer", maxWidth: 150 }}>
-              Go to users list
-            </h5>
-          </Link>
+            <Link href="/users-mobx-state-tree">
+              <Button className="me-3" variant="outlined">
+                Go to users list with MobX State Tree
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <div className="row mb-4">
@@ -170,7 +179,7 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
         <div className="row">
           {data.ready && (
             <DragDropContext onDragEnd={onDragEnd}>
-              {data.tasksLists.map((tasksList) => (
+              {data.tasksLists?.map((tasksList) => (
                 <TaskContext.Provider key={tasksList.id} value={providerValues}>
                   <TasksListComponent tasksList={tasksList} />
                 </TaskContext.Provider>
