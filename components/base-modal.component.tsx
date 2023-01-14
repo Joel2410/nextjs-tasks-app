@@ -1,3 +1,5 @@
+import { useCallback } from "react";
+
 // mui
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -14,13 +16,13 @@ type Props = {
 };
 
 export default function BaseModalComponent(props: Props) {
-  const handleConfirm = () => {
+  const handleConfirm = useCallback(() => {
     props.dialogResult(true);
-  };
+  }, [props]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     props.dialogResult(false);
-  };
+  }, [props]);
 
   return (
     <div>

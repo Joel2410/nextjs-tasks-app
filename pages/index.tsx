@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 import type { NextPage } from "next";
 import Head from "next/head";
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
-import { useLocalObservable, observer } from "mobx-react-lite";
 import { action, runInAction } from "mobx";
+import { useLocalObservable, observer } from "mobx-react-lite";
+import { DragDropContext, DropResult } from "react-beautiful-dnd";
 
 // own imports
 import Task from "../interfaces/task.interface";
@@ -12,6 +12,7 @@ import TasksListComponent from "../components/tasks-list.component";
 import BaseModalComponent from "../components/base-modal.component";
 import { tasksService } from "./_app";
 import TasksDataGrid from "../components/tasks-data-grid";
+import Link from "next/link";
 
 type Props = {
   storedTasksLists: TasksList[];
@@ -108,43 +109,40 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
     await tasksService.updateTasks([originalTask]);
   });
 
-  const onDeleteTask = async (task: Task): Promise<void> => {
+  const onDeleteTask = action(async (task: Task): Promise<void> => {
     taskRef.current = task;
     data.open = true;
-  };
+  });
 
-  async function handleDeleteDialog(choose: boolean) {
+  const providerValues = useMemo(
+    () => ({
+      onChangeTask,
+      onDeleteTask,
+    }),
+    [onChangeTask, onDeleteTask]
+  );
+
+  const handleDeleteDialog = action(async (choose: boolean) => {
     data.open = false;
     if (!choose) return;
     if (!taskRef.current) return;
 
-    const originalList = data.tasksLists.find(
+    const tasksList = data.tasksLists.find(
       (list) => list.id === taskRef.current?.tasksListId
     );
-    if (!originalList) return;
+    if (!tasksList) return;
 
-    const originalTask = originalList.tasks.find(
+    const currentTask = tasksList.tasks.find(
       (task) => task.id === taskRef.current?.id
     );
-    if (originalTask) {
-      originalList.tasks = originalList.tasks.filter(
-        (task) => task.id !== originalTask.id
+    if (currentTask) {
+      tasksList.tasks = tasksList.tasks.filter(
+        (task) => task.id !== currentTask.id
       );
 
-      await tasksService.deleteTask(originalTask);
+      await tasksService.deleteTask(currentTask);
     }
-  }
-
-  const getTasks = (): Task[] => {
-    const tasks: Task[] = [];
-    data.tasksLists.forEach((tasksList) => {
-      tasksList.tasks.forEach((task) => {
-        task.status = tasksList.title;
-        tasks.push(task);
-      });
-    });
-    return tasks;
-  };
+  });
 
   return (
     <div className="container">
@@ -155,20 +153,25 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
       </Head>
 
       <main>
-        <h1 className="my-5">Tasks App!</h1>
+        <div className="my-5">
+          <h1 className="my-2">Tasks App!</h1>
+
+          <Link href="/users">
+            <h5 style={{ color: "blue", cursor: "pointer", maxWidth: 150 }}>
+              Go to users list
+            </h5>
+          </Link>
+        </div>
 
         <div className="row mb-4">
-          {data.ready && <TasksDataGrid tasks={getTasks()} />}
+          {data.ready && <TasksDataGrid tasksLists={data.tasksLists} />}
         </div>
 
         <div className="row">
           {data.ready && (
             <DragDropContext onDragEnd={onDragEnd}>
               {data.tasksLists.map((tasksList) => (
-                <TaskContext.Provider
-                  key={tasksList.id}
-                  value={{ onChangeTask, onDeleteTask }}
-                >
+                <TaskContext.Provider key={tasksList.id} value={providerValues}>
                   <TasksListComponent tasksList={tasksList} />
                 </TaskContext.Provider>
               ))}

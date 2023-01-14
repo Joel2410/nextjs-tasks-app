@@ -6,13 +6,14 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 // own imports
 import Task from "../interfaces/task.interface";
+import TasksList from "../interfaces/tasks-list.interface";
 
 type Props = {
-  tasks: Task[];
+  tasksLists: TasksList[];
 };
 
 function TasksDataGrid(props: Props) {
-  const data = useLocalObservable(() => ({ tasks: props.tasks }));
+  const data = useLocalObservable(() => ({ tasksLists: props.tasksLists }));
 
   const columns: GridColDef[] = [
     {
@@ -32,10 +33,21 @@ function TasksDataGrid(props: Props) {
     },
   ];
 
+  const getTasks = (): Task[] => {
+    const tasks: Task[] = [];
+    data.tasksLists.forEach((tasksList) => {
+      tasksList.tasks.forEach((task) => {
+        task.status = tasksList.title;
+        tasks.push(task);
+      });
+    });
+    return tasks;
+  };
+
   return (
     <Box sx={{ height: 280, width: "100%" }}>
       <DataGrid
-        rows={data.tasks}
+        rows={getTasks()}
         columns={columns}
         pageSize={3}
         rowsPerPageOptions={[3]}
