@@ -6,6 +6,8 @@ import {
   runInAction,
   reaction,
 } from "mobx";
+
+// own imports
 import User from "../interfaces/user.interface";
 
 class UsersStore {
@@ -39,9 +41,7 @@ class UsersStore {
   public async getUsers(): Promise<void> {
     try {
       const res = await fetch(
-        `https://randomuser.me/api/?page=${this.pageNumber}&results=${
-          this.pageSize
-        }&seed=abc`
+        `https://randomuser.me/api/?page=${this.pageNumber}&results=${this.pageSize}&seed=abc`
       );
       const data = await res.json();
       runInAction(

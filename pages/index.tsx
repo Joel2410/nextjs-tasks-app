@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useMemo } from "react";
 import type { NextPage } from "next";
 import Head from "next/head";
+import Link from "next/link";
 import { action, runInAction } from "mobx";
 import { useLocalObservable, observer } from "mobx-react-lite";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
@@ -10,9 +11,8 @@ import Task from "../interfaces/task.interface";
 import TasksList from "../interfaces/tasks-list.interface";
 import TasksListComponent from "../components/tasks-list.component";
 import BaseModalComponent from "../components/base-modal.component";
-import { tasksService } from "./_app";
 import TasksDataGrid from "../components/tasks-data-grid";
-import Link from "next/link";
+import { tasksService } from "./_app";
 
 type Props = {
   storedTasksLists: TasksList[];

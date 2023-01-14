@@ -1,19 +1,17 @@
 import { useCallback } from "react";
+import Head from "next/head";
+import Link from "next/link";
 import { observer } from "mobx-react-lite";
 import { action } from "mobx";
 
 // mui
 import Box from "@mui/material/Box";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Pagination from "@mui/material/Pagination";
-import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 import usersStore from "../stores/users.store";
-import Head from "next/head";
-import Link from "next/link";
 
 function Users() {
   const columns: GridColDef[] = [
