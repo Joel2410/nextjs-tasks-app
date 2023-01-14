@@ -33,12 +33,12 @@ function TasksDataGrid(props: Props) {
     ];
 
     return (
-        <Box sx={{ height: 400, width: "100%" }}>
+        <Box sx={{ height: 280, width: "100%" }}>
             <DataGrid
                 rows={data.tasks}
                 columns={columns}
-                pageSize={5}
-                rowsPerPageOptions={[5]}
+                pageSize={3}
+                rowsPerPageOptions={[3]}
                 checkboxSelection
                 disableSelectionOnClick
                 experimentalFeatures={{ newEditingApi: true }}
