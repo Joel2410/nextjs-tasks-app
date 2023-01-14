@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
@@ -25,11 +25,10 @@ type TaskContextValue = {
 export const TaskContext = React.createContext<TaskContextValue>({});
 
 const Home: NextPage<Props> = ({ storedTasksLists }) => {
-
   const data = useLocalObservable(() => ({
     tasksLists: storedTasksLists,
     ready: false,
-    open: false
+    open: false,
   }));
 
   const taskRef = useRef<Task>();
@@ -40,7 +39,7 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
         data.ready = true;
       });
     }
-  }, []);
+  }, [data]);
 
   const onDragEnd = action(async (result: DropResult): Promise<void> => {
     if (!result.source || !result.destination) {
@@ -80,14 +79,14 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
       });
     }
 
-    const uptatedTasks = [...originList.tasks];
+    const updatedTasks = [...originList.tasks];
 
     if (originList.id !== destinationList.id) {
-      uptatedTasks.push(...destinationList.tasks);
+      updatedTasks.push(...destinationList.tasks);
     }
 
     try {
-      await tasksService.updateTasks(uptatedTasks);
+      await tasksService.updateTasks(updatedTasks);
     } catch (error) {
       console.error(error);
     }
@@ -114,7 +113,7 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
     data.open = true;
   };
 
-  const handleDeleteDialog = async (choose: boolean) => {
+  async function handleDeleteDialog(choose: boolean) {
     data.open = false;
     if (!choose) return;
     if (!taskRef.current) return;
@@ -134,7 +133,7 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
 
       await tasksService.deleteTask(originalTask);
     }
-  };
+  }
 
   const getTasks = (): Task[] => {
     const tasks: Task[] = [];
@@ -142,7 +141,7 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
       tasksList.tasks.forEach((task) => {
         task.status = tasksList.title;
         tasks.push(task);
-      })
+      });
     });
     return tasks;
   };
@@ -159,7 +158,7 @@ const Home: NextPage<Props> = ({ storedTasksLists }) => {
         <h1 className="my-5">Tasks App!</h1>
 
         <div className="row mb-4">
-          {data.ready && (<TasksDataGrid tasks={getTasks()} />)}
+          {data.ready && <TasksDataGrid tasks={getTasks()} />}
         </div>
 
         <div className="row">

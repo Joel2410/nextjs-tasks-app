@@ -14,7 +14,7 @@ type Props = {
 };
 
 export default function BaseModalComponent(props: Props) {
-  const hadleConfirm = () => {
+  const handleConfirm = () => {
     props.dialogResult(true);
   };
 
@@ -38,7 +38,7 @@ export default function BaseModalComponent(props: Props) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCancel}>No</Button>
-          <Button onClick={hadleConfirm} autoFocus>
+          <Button onClick={handleConfirm} autoFocus>
             Yes
           </Button>
         </DialogActions>

@@ -21,7 +21,9 @@ type Props = {
 const TaskForm: NextPage<Props> = ({ task }) => {
   const router = useRouter();
   const isEdit = !!task.id;
-  const data = useLocalObservable(() => ({ formData: task ?? tasksService.newTask() }));
+  const data = useLocalObservable(() => ({
+    formData: task ?? tasksService.newTask(),
+  }));
 
   const onSubmit: FormEventHandler = async (event) => {
     event.preventDefault();
@@ -48,7 +50,7 @@ const TaskForm: NextPage<Props> = ({ task }) => {
 
   const handleChange = action((event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
-    data.formData = { ...data.formData, [id]: value }
+    data.formData = { ...data.formData, [id]: value };
   });
 
   return (

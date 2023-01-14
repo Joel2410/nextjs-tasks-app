@@ -8,43 +8,43 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Task from "../interfaces/task.interface";
 
 type Props = {
-    tasks: Task[];
+  tasks: Task[];
 };
 
 function TasksDataGrid(props: Props) {
-    const data = useLocalObservable(() => ({ tasks: props.tasks }));
+  const data = useLocalObservable(() => ({ tasks: props.tasks }));
 
-    const columns: GridColDef[] = [
-        {
-            field: "title",
-            headerName: "Title",
-            width: 200,
-        },
-        {
-            field: "description",
-            headerName: "Description",
-            width: 300,
-        },
-        {
-            field: "status",
-            headerName: "Status",
-            width: 150,
-        }
-    ];
+  const columns: GridColDef[] = [
+    {
+      field: "title",
+      headerName: "Title",
+      width: 200,
+    },
+    {
+      field: "description",
+      headerName: "Description",
+      width: 300,
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 150,
+    },
+  ];
 
-    return (
-        <Box sx={{ height: 280, width: "100%" }}>
-            <DataGrid
-                rows={data.tasks}
-                columns={columns}
-                pageSize={3}
-                rowsPerPageOptions={[3]}
-                checkboxSelection
-                disableSelectionOnClick
-                experimentalFeatures={{ newEditingApi: true }}
-            />
-        </Box>
-    );
+  return (
+    <Box sx={{ height: 280, width: "100%" }}>
+      <DataGrid
+        rows={data.tasks}
+        columns={columns}
+        pageSize={3}
+        rowsPerPageOptions={[3]}
+        checkboxSelection
+        disableSelectionOnClick
+        experimentalFeatures={{ newEditingApi: true }}
+      />
+    </Box>
+  );
 }
 
 export default observer(TasksDataGrid);

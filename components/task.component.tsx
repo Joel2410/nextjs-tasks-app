@@ -26,7 +26,7 @@ export default function TaskComponent(props: Props) {
   const { onChangeTask, onDeleteTask } = useContext(TaskContext);
   const data = useLocalObservable(() => ({
     task: props.task,
-    loading: false
+    loading: false,
   }));
 
   const deployTask = action(async () => {
@@ -57,53 +57,55 @@ export default function TaskComponent(props: Props) {
     <Draggable draggableId={data.task.id} index={index}>
       {(provided, _snapshot) => (
         <Observer>
-          {() => (<div
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-          >
-            <Accordion
+          {() => (
+            <div
               ref={provided.innerRef}
-              expanded={data.task.deployed}
-              className="mb-3"
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
             >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                disableRipple={false}
-                onClick={deployTask}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
+              <Accordion
+                ref={provided.innerRef}
+                expanded={data.task.deployed}
+                className="mb-3"
               >
-                <Typography variant="subtitle2">{data.task.title}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography variant="body2" className="card p-2">
-                  {data.task.description}
-                </Typography>
-                <div className="footer row mt-4">
-                  <Button
-                    type="button"
-                    variant="contained"
-                    className="col mx-2"
-                    color="secondary"
-                    onClick={deleteTask}
-                  >
-                    Delete
-                  </Button>
-                  <Link href={`task-form?taskId=${data.task.id}`}>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  disableRipple={false}
+                  onClick={deployTask}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
+                >
+                  <Typography variant="subtitle2">{data.task.title}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Typography variant="body2" className="card p-2">
+                    {data.task.description}
+                  </Typography>
+                  <div className="footer row mt-4">
                     <Button
                       type="button"
                       variant="contained"
                       className="col mx-2"
-                      color="primary"
+                      color="secondary"
+                      onClick={deleteTask}
                     >
-                      Edit
+                      Delete
                     </Button>
-                  </Link>
-                </div>
-              </AccordionDetails>
-            </Accordion>
-          </div>)}
+                    <Link href={`task-form?taskId=${data.task.id}`}>
+                      <Button
+                        type="button"
+                        variant="contained"
+                        className="col mx-2"
+                        color="primary"
+                      >
+                        Edit
+                      </Button>
+                    </Link>
+                  </div>
+                </AccordionDetails>
+              </Accordion>
+            </div>
+          )}
         </Observer>
       )}
     </Draggable>
